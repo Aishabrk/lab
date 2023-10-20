@@ -1,0 +1,141 @@
+# 1 task 
+number = int(input("enter four digit number: "))
+
+x1 = number // 1000
+x2 = (number // 100) % 10
+x3 = (number // 10) % 10
+x4 = number % 10
+
+if x1 + x4 == x2 - x3:
+    print("yes")
+else:
+    print("no")
+
+
+
+# 2 task. доступ к интернет-ресурсу по возрасту
+age = int(input("enter age: "))
+
+if age >= 18:
+    print("Access is allowed")
+else:
+    print("Access denied")
+
+
+# 3 task. Арифметическая прогрессия,определение последовательности
+a = int(input("enter three number: "))
+b = int(input())
+c = int(input())
+
+if b - a == c - b:
+    print("YES")
+else:
+    print("NO")
+
+
+# 4 task. Ладья ходит по горизонтали и вертикали
+x1, y1 = int(input()), int(input())
+x2, y2 = int(input()), int(input())
+
+if (x1 == x2) or (y1 == y2):
+    print("YES")
+else:
+    print("NO")
+
+
+#5 task.Короли ходят на одну клетку
+x1, y1 = int(input()), int(input())
+x2, y2 = int(input()), int(input())
+
+if (-1 <= x1 - x2 <= 1 ) and (-1 <= y1 - y2 <= 1):
+    print("YES")
+else:
+    print("NO")
+
+
+# 6 task. Среднее число
+a = int(input())
+b = int(input())
+c = int(input())
+
+numbers = [a, b, c]
+
+numbers.sort()
+
+print(numbers[1])
+
+
+#7 task. Количество дней в месяце
+month = int(input("month"))
+
+if month == 2:
+    print(28)
+elif month == 4 or month == 6 or month == 9 or month == 11:
+    print(30)
+else:
+    print(31)
+
+
+#8 task. Определение веса средний легкий тяж
+weight = int(input())
+
+if weight <= 60:
+    print("Light weight")
+elif weight <= 64:
+    print("First welterweight")
+else:
+    print("Welterweight")
+
+
+# 9 task. Проверка пароля
+password = input()
+password_confirmation = input()
+
+if password == password_confirmation:
+    print("Password accepted")
+else:
+    print("Password not accepted")
+
+
+
+#10 task. нечетный или четный
+number = int(input())
+
+if number % 2 == 0:
+    print("Even value")
+else:
+    print("Odd number")
+
+
+# 11 task. Найти минимум из чисел
+number1 = int(input())
+number2 = int(input())
+
+print(min(number1, number2))
+
+
+# 12 task. возраст
+age = int(input())
+
+if age <= 13:
+    print("childhood")
+elif 14 <= age <= 24:
+    print("youth")
+elif 25 <= age <= 59:
+    print("maturity")
+else:
+    print("old age")
+
+
+# 13 task. 
+тип треугольника
+a = int(input())
+b = int(input())
+c = int(input())
+
+if a == b == c:
+    print("Equilateral")
+elif a == b or b == c or a == c:
+    print("Isosceles")
+else:
+    print("Versatile")
