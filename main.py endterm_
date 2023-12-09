@@ -1,0 +1,316 @@
+#Task 1
+def translateLetter(*letters):
+    # Translation table for letter grades to points
+    grade_points = {'A+': 4.3, 'A': 4.0, 'A-': 3.7, 'B+': 3.3, 'B': 3.0,
+                    'B-': 2.7, 'C+': 2.3, 'C': 2.0, 'C-': 1.7, 'D+': 1.3,
+                    'D': 1.0, 'D-': 0.7}
+
+    return [grade_points.get(letter, 0.0) for letter in letters]
+
+def translatePercentage(*percentages):
+    # Translation table for percentage scores to points
+    score_points = {100: 4.3, 95: 4.0, 90: 3.7, 85: 3.3, 80: 3.0,
+                    75: 2.7, 70: 2.3, 65: 2.0, 60: 1.7, 55: 1.3,
+                    50: 1.0, 45: 0.7}
+
+    return [score_points.get(percentage, 0.0) for percentage in percentages]
+
+def calculateGPA(*args):
+    # Combine points and credits and calculate overall GPA
+    points_credits = zip(*args)
+    total_points = total_credits = 0
+
+    for point, credit in points_credits:
+        total_points += point * credit
+        total_credits += credit
+
+    if total_credits > 0:
+        return total_points / total_credits
+    else:
+        return 0.0
+
+# Example Usage:
+letter_points = translateLetter('A+', 'B', 'C')
+percentage_points = translatePercentage(100, 45, 55, 89)
+
+gpa = calculateGPA(letter_points, [4, 3, 4], percentage_points, [4, 3, 4])
+print(f"Overall GPA: {gpa:.2f}")
+
+
+
+#Task 2 
+
+import os
+import random
+
+# Function to calculate GPA using the provided formula
+def calculateGPA(scores):
+    total_credits = 0
+    weighted_score = 0
+
+    for course, info in scores.items():
+        score = info['score']
+        credits = info['credits']
+        total_credits += credits
+        weighted_score += score * credits
+
+    if total_credits > 0:
+        return weighted_score / total_credits
+    else:
+        return 0
+
+# Function to translate grades to points (using random values for demonstration)
+def translateScores(grade):
+    # For the sake of example, use random GPA values between 2.0 and 4.0
+    return random.uniform(2.0, 4.0)
+
+# Function to read scores from a file
+def readScoresFromFile(file_path):
+    scores = {}
+    with open(file_path, 'r') as file:
+        for line in file:
+            course, grade = line.strip().split(',')
+            scores[course] = {'score': translateScores(grade), 'credits': 0}
+    return scores
+
+# Function to read credits from "credits.txt" file
+def readCreditsFromFile(credits_file_path):
+    credits = {}
+    with open(credits_file_path, 'r') as file:
+        for line in file:
+            course, credit = line.strip().split(',')
+            credits[course] = int(credit)
+    return credits
+
+# Function to calculate overall GPA and save results to "overallGPAs.txt"
+def calculateOverallGPA(grades_directory):
+    overall_gpas = {}
+
+    # Read credits from "credits.txt"
+    credits_file_path = os.path.join(grades_directory, 'credits.txt')
+    credits = readCreditsFromFile(credits_file_path)
+
+    # Iterate through all files in the "grades" directory
+    for filename in os.listdir(grades_directory):
+        if filename.endswith(".txt") and filename != 'credits.txt':
+            file_path = os.path.join(grades_directory, filename)
+
+            # Read scores from the file
+            scores = readScoresFromFile(file_path)
+
+            # Update credits in the scores dictionary
+            for course, info in scores.items():
+                info['credits'] = credits.get(course, 0)
+
+            # Calculate GPA for each student
+            for student, student_scores in scores.items():
+                if student not in overall_gpas:
+                    overall_gpas[student] = {'gpa': 0, 'status': 'Not Set'}
+                overall_gpas[student]['gpa'] += calculateGPA(student_scores)
+
+    # Calculate overall GPA and status for each student
+    for student, info in overall_gpas.items():
+        info['gpa'] /= len(os.listdir(grades_directory) - 1)  # Exclude 'credits.txt'
+        info['status'] = 'Passed' if info['gpa'] >= 1.0 else 'Not Passed'
+
+    # Save results to "overallGPAs.txt"
+    output_file_path = os.path.join(grades_directory, 'overallGPAs.txt')
+    with open(output_file_path, 'w') as output_file:
+        for student, info in overall_gpas.items():
+            output_file.write(f'{student}: GPA={info["gpa"]:.2f}, Status={info["status"]}\n')
+
+# Example Usage:
+grades_directory = 'grades'
+calculateOverallGPA(grades_directory)
+
+
+
+
+
+#task 3
+
+class Student:
+    def __init__(self, name, num_courses, scores):
+        self.name = name
+        self.num_courses = num_courses
+        self.scores = scores
+        self.gpa = None
+        self.status = None
+
+    def calculateGPA(self):
+        total_credits = 0
+        weighted_score = 0
+
+        for course, info in self.scores.items():
+            score = info['score']
+            credits = info['credits']
+            total_credits += credits
+            weighted_score += score * credits
+
+        if total_credits > 0:
+            self.gpa = weighted_score / total_credits
+        else:
+            self.gpa = 0
+
+    def setStatus(self):
+        if self.gpa is not None:
+            self.status = 'Passed' if self.gpa >= 1.0 else 'Not Passed'
+        else:
+            self.status = 'Not Set'
+
+    def showGPA(self):
+        if self.gpa is not None:
+            print(f'{self.name}\'s GPA: {self.gpa:.2f}')
+        else:
+            print('GPA not calculated. Call calculateGPA() first.')
+
+    def showStatus(self):
+        if self.status is not None:
+            print(f'{self.name}\'s Status: {self.status}')
+        else:
+            print('Status not set. Call setStatus() first.')
+
+# Example Usage:
+student_scores = {
+    'math': {'score': 4.3, 'credits': 4},
+    'chemistry': {'score': 3.3, 'credits': 3},
+    'english': {'score': 4.0, 'credits': 4}
+}
+
+student = Student(name='John Doe', num_courses=3, scores=student_scores)
+
+# Calculate GPA and set status
+student.calculateGPA()
+student.setStatus()
+
+# Display GPA and status
+student.showGPA()
+student.showStatus()
+
+#Task 4
+
+#API stands for Application Programming Interface. 
+#It is a set of rules that allows one software application to interact with another. 
+#APIs define the methods and data formats that applications can use to request and exchange information.
+#They serve as a bridge between different software systems, enabling them to communicate and share data seamlessly.
+
+#Use Cases of API:
+#Integration with Third-Party Services:APIs allow applications to integrate with third-party services and leverage their features. 
+#Data Retrieval: APIs enable applications to retrieve data from external sources, such as databases, cloud services, or other web services.
+#Automation: APIs are used for automating repetitive tasks by enabling communication between different software systems. 
+#Developing Mobile Apps: Mobile applications often use APIs to interact with backend servers, retrieve data, and perform various functions.
+#Microservices Architecture: In a microservices architecture, different services communicate with each other via APIs, allowing for scalability, flexibility, and independent deployment.
+
+#Limitations of API:
+
+#Rate Limits: Many APIs impose rate limits to control the number of requests a user can make in a given time period. This can restrict the amount of data you can fetch or operations you can perform.
+#Dependency on External Services: Applications relying on external APIs are dependent on the availability and reliability of those services. 
+#Security Concerns: Improperly implemented or insecure APIs can pose security risks. Developers need to ensure proper authentication, authorization, and data encryption.
+#Changes in API Versions: APIs can evolve, and new versions may be released. Upgrading to a new version may require modifications to existing code, leading to compatibility issues.
+#Limited Functionality: Some APIs may not provide all the features or data needed by an application. This may require developers to use multiple APIs or find alternative solutions.
+
+#example with code snippets of using API with Python.
+
+import requests
+
+# Replace 'YOUR_API_KEY' with the actual API key obtained from OpenWeatherMap
+api_key = 'YOUR_API_KEY'
+city = 'London'
+
+# API endpoint for current weather data
+url = f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}'
+
+# Make a GET request to the API
+response = requests.get(url)
+
+# Check if the request was successful (status code 200)
+if response.status_code == 200:
+    # Parse the JSON data
+    data = response.json()
+
+    # Extract relevant information
+    temperature = data['main']['temp']
+    weather_description = data['weather'][0]['description']
+
+    # Display the results
+    print(f'Temperature in {city}: {temperature}°C')
+    print(f'Weather Description: {weather_description}')
+else:
+    print(f'Error: Unable to fetch data. Status code: {response.status_code}')
+
+
+
+
+#Task 5 Socket.
+
+#A socket is a low-level programming mechanism in networking that provides a way for processes on different devices to communicate over a network. It allows data to be sent and received between devices, facilitating communication between applications running on those devices.
+#Sockets use the client-server model, where one device acts as a server, waiting for incoming connections, and the other device acts as a client, initiating a connection to the server. Sockets can be used for communication on the same machine (local communication) or across different machines (network communication).
+
+#Use Cases of Sockets:
+#Client-Server Communication: Sockets are commonly used for building client-server applications where a server provides services or resources, and clients connect to the server to request or consume those services.
+#Real-time Communication: Sockets are crucial for real-time communication applications such as chat applications, online gaming, and streaming services.
+#Distributed Systems: Sockets play a vital role in distributed systems where multiple components or processes need to communicate with each other over a network.
+#File Transfer: Sockets can be employed to transfer files between devices or to implement protocols for efficient and reliable file transfer.
+#Network Protocols: Many network protocols, including HTTP, FTP, and SMTP, rely on sockets for communication between clients and servers.
+
+#Example of Using Sockets with Python:
+
+
+
+#server 
+import socket
+
+# Create a socket object
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+# Bind the socket to a specific address and port
+server_address = ('localhost', 12345)
+server_socket.bind(server_address)
+
+# Listen for incoming connections
+server_socket.listen(1)
+print('Server listening on {}:{}'.format(*server_address))
+
+while True:
+    # Wait for a connection
+    print('Waiting for a connection...')
+    client_socket, client_address = server_socket.accept()
+    print('Connection from {}'.format(client_address))
+
+    # Receive and echo back data
+    data = client_socket.recv(1024)
+    print('Received: {!r}'.format(data))
+    client_socket.sendall(data)
+
+    # Close the connection
+    print('Connection closed by server')
+    client_socket.close()
+
+
+
+
+
+#client 
+import socket
+
+# Create a socket object
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+# Connect to the server
+server_address = ('localhost', 12345)
+client_socket.connect(server_address)
+
+try:
+    # Send data to the server
+    message = 'Hello, server!'
+    client_socket.sendall(message.encode('utf-8'))
+    print('Sent: {!r}'.format(message))
+
+    # Receive the response from the server
+    data = client_socket.recv(1024)
+    print('Received: {!r}'.format(data.decode('utf-8')))
+finally:
+    # Close the connection
+    print('Closing the connection')
+    client_socket.close()
+
