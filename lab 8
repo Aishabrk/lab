@@ -1,0 +1,208 @@
+# lab 8 
+import requests
+import json
+import random
+
+# Task 1
+# 1.1 GET Request
+
+
+post_id = 1  #Определение переменных
+url = f'https://jsonplaceholder.typicode.com/todos/{post_id}'
+#Переменная url создаетсмя с использованием f строки которая позволяет вставить значение post_id в URL.
+response = requests.get(url) #Выполнение HTTP GET-запроса. Функция requests.get() используется для выполнения HTTP GET запроса по указанному URL. Полученный ответ сохраняется в переменной response.
+
+ #Обработка ответа.  
+if response.status_code >= 400:
+    print(f"Error: {response.status_code}") #проверяет если HTTP статус код ответа равен 400 или больше. Если это так выводится сообщение об ошибке вместе с кодом состояния. 
+else:
+    print("1.1 - Response Content:")
+    print(response.json()) #Если статус код меньше 400, это означает успешное выполнение запроса
+    
+  
+    
+# 1.2 Create ToDo class
+
+#Определение класса
+class ToDo:
+    #Метод __init__
+    def __init__(self, userId, id, title, completed): #вызывается при создании нового объекта этого класса
+        #Инициализация атрибутоы
+        self.userId = userId
+        self.id = id
+        self.title = title
+        self.completed = completed  #атрибуты объекта userId, id, title, и completed инициализируются значениями. Каждый из этих атрибутов представляет собой характеристики задачи todo
+
+# 1.3 Create new object
+new_todo = ToDo(1, 1, "New ToDo", False)
+#Здесь создается новый объект new_todo класса ToDo. При создании передаются значения атрибутов- userId: 1,id: 1,title: "New ToDo",completed: False
+
+
+# 1.4 POST Request Этот код выполняет HTTP POST запрос к JSONPlaceholder API для создания новой задачи (todo)
+#Создание словаря new_todo:
+new_todo = {
+    "userId": new_todo_object.userId,
+    "title": new_todo_object.title,
+    "completed": new_todo_object.completed
+}
+
+#Выполнение HTTP POST запроса
+post_response = requests.post('https://jsonplaceholder.typicode.com/todos', json=new_todo)
+
+#Обработка ответа
+if post_response.status_code >= 400:
+    print(f"Error: {post_response.status_code}")
+else:
+    print("1.4 - POST Response Content:")
+    print(post_response.json())
+    
+    
+# 1.5 Edit data
+new_todo_object.title = "Updated Todo Title"
+new_todo_object.completed = True
+#после выполнения этих строк кода объект new_todo_object будет содержать обновленную информацию о задаче.
+
+# 1.6 PUT Request Этот код выполняет HTTP PUT запрос к JSONPlaceholder API для обновления информации о задаче todo с выбранным идентификатором
+#Создание словаря updated_todo_dict
+updated_todo_dict = {
+    "userId": new_todo.userId,
+    "id": new_todo.id,
+    "title": new_todo.title,
+    "completed": new_todo.completed
+} #представляет обновленную информацию о задаче
+
+#Выбор идентификатора задачи для обновлени
+chosen_id = 1  # Replace with the chosen todo item ID
+#Выполнение HTTP PUTзапроса
+response_put = requests.put(f"https://jsonplaceholder.typicode.com/todos/{chosen_id}", json=updated_todo_dict)
+#Обработка ответа
+if response_put.status_code >= 400:
+    print(f"Error: {response_put.status_code}")
+else:
+    print("PUT Request Content:", response_put.json()) #После выполнения запроса проверяется статус-код ответа. Если статус-код больше или равен 400, выводится сообщение об ошибке. В противном случае, выводится содержимое ответа на PUT-запрос, включая JSON-данные, с использованием response_put.json().
+
+# Task 2
+# 2.1 Random Character Request Этот код выполняет HTTP GET-запрос к API "Rick and Morty" для получения информации о персонаже с случайным идентификатором
+
+#Генерация случайного идентификатора персонажа:
+character_id = random.randint(1, 826) #Генерируется случайное число в диапазоне от 1 до 826
+character_response = requests.get(f"https://rickandmortyapi.com/api/character/{character_id}") #для получения информации о персонаже с указанным идентификатором
+#Вывод информации о персонаже и его ключей
+print("2.2 Response:", character_response.json())
+print("2.2 Keys:", character_response.json().keys())
+
+#Выводится JSON-содержимое ответа на запрос, а затем выводятся ключи этого JSON-объекта. Это позволяет посмотреть на структуру данных и доступные атрибуты для выбранного персонаж
+
+# 2.3 Save to File Этот код создает и записывает информацию о персонаже из API "Rick and Morty" в файл в формате JSON
+with open(f"info_character_{character_id}.json", 'w') as file:
+    json.dump(character_response.json(), file)
+
+# 2.4 Episode List
+#Этот код извлекает идентификаторы эпизодов, в которых участвует персонаж из API "Rick and Morty"
+episodes = character_response.json()['episode']
+episode_ids = [episode.split('/')[-1] for episode in episodes]
+
+with open(f"all_episodes_with_character_{character_id}", 'a') as file:
+    for episode_id in episode_ids:
+        file.write(f"https://rickandmortyapi.com/api/episode/{episode_id}\n")
+
+# 2.5 Episode Response Structure Этот код выполняет HTTP GET-запрос к API "Rick and Morty" для получения информации о первом эпизоде.
+episode_response = requests.get("https://rickandmortyapi.com/api/episode/1") #Выполнение HTTP GET-запроса к эпизоду
+print("2.5 Episode Response:", episode_response.json()) #Вывод информации о эпизоде
+
+# 2.6 Episode Class Creation (Episode.py)
+# Define Episode class with attributes obtained from episode response
+class Episode:
+    def __init__(self, id, name, air_date, episode, characters): #Метод __init__ —это конструктор класса который вызывается при создании нового объекта этого класса
+      #Инициализация атрибутов
+        self.id = id
+        self.name = name
+        self.air_date = air_date
+        self.episode = episode
+        self.characters = characters #В этой части кода атрибуты объекта id, name, air_date, episode и characters инициализируются значениями, переданными в качестве аргументов при создании объекта класса.
+# 2.7 Episode Data Retrieval
+# Iterate through episode ids, make requests, create Episode objects, and store them in a list
+episode_objects = []
+for episode_url in episodes:
+    episode_data = requests.get(episode_url).json()
+    episode_objects.append(Episode(
+        id=episode_data["id"],
+        name=episode_data["name"],
+        air_date=episode_data["air_date"],
+        episode=episode_data["episode"],
+        characters=episode_data["characters"]
+    ))
+
+# 2.8 Class Methods
+# Add methods to the Episode class
+class Episode:
+    def __init__(self, id, name, air_date, episode, characters):
+        self.id = id
+        self.name = name
+        self.air_date = air_date
+        self.episode = episode
+        self.characters = characters
+
+    def display_info(self):
+        print(f"Episode {self.episode}: {self.name}, Air Date: {self.air_date}")
+
+
+# 2.9 Character Response Structure
+character_id = 1
+character_url = f'https://rickandmortyapi.com/api/character/{character_id}'
+
+
+character_response = requests.get(character_url)
+
+print(f"2.9 - JSON response for character {character_id} structure:")
+print(character_response.json())
+
+
+# 2.10 Character Class Creation (Character.py)
+# Define Character class with attributes obtained from character response
+class Character:
+    def __init__(self, id, name, status, species, type, gender, origin, location, image, episodes):
+        self.id = id
+        self.name = name
+        self.status = status
+        self.species = species
+        self.type = type
+        self.gender = gender
+        self.origin = origin
+        self.location = location
+        self.image = image
+        self.episodes = episodes
+# 2.11 Character Object Creation
+# Create an object "random_character" of the "Character" class
+random_character_data = character_response.json()
+random_character_object = Character(
+    id=random_character_data["id"],
+    name=random_character_data["name"],
+    status=random_character_data["status"],
+    species=random_character_data["species"],
+    type=random_character_data["type"],
+    gender=random_character_data["gender"],
+    origin=random_character_data["origin"]["name"],
+    location=random_character_data["location"]["name"],
+    image=random_character_data["image"],
+    episodes=random_character_data["episode"]
+)
+# 2.12 Character Class Methods
+# Add methods to the Character class
+class Character:
+    def __init__(self, id, name, status, species, type, gender, origin, location, image, episodes):
+        self.id = id
+        self.name = name
+        self.status = status
+        self.species = species
+        self.type = type
+        self.gender = gender
+        self.origin = origin
+        self.location = location
+        self.image = image
+        self.episodes = episodes
+
+    def display_info(self):
+        print(f"Character: {self.name}, Status: {self.status}, Species: {self.species}")
+# 2.13 Results
+# Show all results
